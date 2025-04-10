@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using WPFLabs.Repository;
 
 namespace WPFLabs
 {
@@ -22,6 +23,37 @@ namespace WPFLabs
         public RegistrationWindow()
         {
             InitializeComponent();
+        }
+
+        private void RegistrationButton_Click(object sender, RoutedEventArgs e)
+        {
+            var email = EmailTextBox.Text;
+            var name = UsernameTextBox.Text;
+            var password = PasswordTextBox.Password;
+            var confirmPassword = ConfirmPasswordTextBox.Password;
+
+            try
+            {
+                var user = UserRepository.GetInstance()
+                                         .Register(
+                    new Entities.UserModel()
+                {
+                    Id = 0,
+                    Email = email,
+                    Name = name,
+                    Password = password
+                }, confirmPassword);
+
+                LocalStateRepository.GetInstance().SetUser(user);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            new MainEmptyWindow().Show();
+            Close();
         }
     }
 }
